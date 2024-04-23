@@ -1,0 +1,30 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+
+.shuffle-button {
+    position: fixed;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 16px;
+    font-size: 14px;
+    text-transform: uppercase;
+    font-weight: bold;
+    border-radius: 4px;
+    border: none;
+    transition: background-color 0.2s;
+}
+
+.shuffle-button:hover {
+    background-color: #cccccc;
+    cursor: pointer;
+}
