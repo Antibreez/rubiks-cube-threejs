@@ -1,6 +1,8 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { Reflector } from 'three/examples/jsm/objects/Reflector.js';
 import TWEEN from 'three/examples/jsm/libs/tween.module';
+import Stats from 'stats.js';
 
 import './style.css';
 
@@ -22,6 +24,50 @@ const scene = new THREE.Scene();
 
 // const axesHelper = new THREE.AxesHelper();
 // scene.add(axesHelper);
+
+const mirrorPositions = [
+  [0, 0, -10],
+  [-10, 0, 0],
+  [10, 0, 0],
+  [0, 0, 10]
+];
+
+const mirrorFramePositions = [
+  [0, 0, -11],
+  [-11, 0, 0],
+  [11, 0, 0],
+  [0, 0, 11]
+];
+
+const mirrorRotations = [0, Math.PI / 2, -(Math.PI / 2), Math.PI];
+
+for (let i = 0; i <= 0; i++) {
+  const behindMirrorFrame = new THREE.Mesh(
+    new THREE.PlaneGeometry(17, 12),
+    new THREE.MeshStandardMaterial({
+      color: '#444444',
+      metalness: 0,
+      roughness: 0.5,
+    })
+  )
+  behindMirrorFrame.position.set(...mirrorFramePositions[i]);
+  behindMirrorFrame.rotation.y = mirrorRotations[i];
+  scene.add(behindMirrorFrame);
+  
+  const behindMirror = new Reflector(
+    new THREE.PlaneGeometry(15, 10), 
+    {
+      clipBias: 1,
+      textureWidth: window.innerWidth * window.devicePixelRatio,
+      textureHeight: window.innerHeight * window.devicePixelRatio,
+      color: 'white',
+    }
+  );
+  behindMirror.position.set(...mirrorPositions[i]);
+  behindMirror.rotation.y = mirrorRotations[i];
+  scene.add(behindMirror);
+}
+
 
 const geometry = new THREE.BoxGeometry(1, 1, 1);
 
@@ -157,21 +203,29 @@ const controls = new OrbitControls(camera, canvas);
 controls.enableDamping = true;
 // controls.maxPolarAngle = Math.PI * 2;
 
+const stats = new Stats();
+stats.showPanel(0);
+document.body.appendChild(stats.dom)
+
 scene.add(camera);
 
 group.receiveShadow = true;
 
-// const light = new THREE.HemisphereLight(0xffffff, 0x000000, 2);
-const pointLight = new THREE.PointLight(0xffffff, 40);
+const light = new THREE.DirectionalLight(0xffffff, 3);
+light.position.set(0, 50, 0);
+const pointLight = new THREE.PointLight(0xffffff, 80);
 
-// scene.add(light);
+
+camera.add(light);
 camera.add(pointLight);
 
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
 renderer.setSize(sizes.width, sizes.height);
 renderer.render(scene, camera);
+// renderer.setClearColor( 0x555555,);
 
 const tick = () => {
+  stats.begin();
   controls.update();
   TWEEN.update();
   // axeGroups.z[0].rotation.z = elapsedTime;
@@ -181,7 +235,7 @@ const tick = () => {
   }
 
   renderer.render(scene, camera);
-
+  stats.end();
   window.requestAnimationFrame(tick);
 }
 
